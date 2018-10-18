@@ -38,8 +38,9 @@ public class MainActivity extends AppCompatActivity {
         });
         RecyclerView recyclerView = findViewById(R.id.recycler);
         recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(LinearLayoutManager);
-        functions = getResources().getStringArray(R.array.functions);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(new FunctionAdapter(this));
+
 
     }
     @Override

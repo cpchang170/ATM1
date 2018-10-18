@@ -5,6 +5,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 
 import com.google.firebase.database.DataSnapshot;
@@ -16,6 +18,7 @@ public class LoginActivity extends AppCompatActivity {
     private static final String TAG = LoginActivity.class.getSimpleName();
     private EditText eduserid;
     private EditText edpwd;
+    private CheckBox cb_account_remerber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,11 +32,28 @@ public class LoginActivity extends AppCompatActivity {
         int level = getSharedPreferences("atm",MODE_PRIVATE)
                 .getInt("LEVEL",0);
         Log.d(TAG, "onCreate: "+ level);
-        String userid = getSharedPreferences("atm",MODE_PRIVATE)
-                .getString("USERID","");
+
         eduserid = findViewById(R.id.ed_account);
         edpwd = findViewById(R.id.ed_pwd);
-        eduserid.setText(userid);
+
+        cb_account_remerber = findViewById(R.id.cb_account_rem_id);
+        Boolean account_check =  getSharedPreferences("atm",MODE_PRIVATE)
+                .getBoolean("REMEMBER_ACCOUNT",false);
+        if (account_check){
+            String userid = getSharedPreferences("atm",MODE_PRIVATE)
+                    .getString("USERID","");
+                    eduserid.setText(userid);
+        }
+        cb_account_remerber.setChecked(account_check);
+        cb_account_remerber.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Boolean account_check =  getSharedPreferences("atm",MODE_PRIVATE)
+                        .edit()
+                        .putBoolean("REMEMBER_ACCOUNT",isChecked)
+                        .commit();
+            }
+        });
     }
 
     public void login(View v) {
@@ -46,10 +66,21 @@ public class LoginActivity extends AppCompatActivity {
                         String pw = (String) dataSnapshot.getValue();
                         if (pw.equals(pwdstr)) {
                             setResult(RESULT_OK);
-                            getSharedPreferences("atm",MODE_PRIVATE)
-                                    .edit()
-                                    .putString("USERID",useridstr)
-                                    .commit();
+                            Boolean account_check = getSharedPreferences("atm",MODE_PRIVATE)
+                                    .getBoolean("REMEMBER_ACCOUNT",false);
+                            if (account_check) {
+                                getSharedPreferences("atm", MODE_PRIVATE)
+                                        .edit()
+                                        .putString("USERID", useridstr)
+                                        .commit();
+
+                            }
+                            else {
+                                getSharedPreferences("atm", MODE_PRIVATE)
+                                        .edit()
+                                        .putString("USERID", null)
+                                        .commit();
+                            }
                             finish();
                         } else {
                             new AlertDialog.Builder(LoginActivity.this)
