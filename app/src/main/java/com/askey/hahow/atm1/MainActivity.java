@@ -1,9 +1,15 @@
 package com.askey.hahow.atm1;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.media.MediaBrowserServiceCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,11 +19,13 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.security.Permission;
 import java.util.ArrayList;
 import java.util.List;
-
+import android.Manifest;
 public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CODE = 100 ;
+    private static final int REQUEST_CODE_CAMERA = 120;
     Boolean logon = false;
     //private List<Function> functions;
 
@@ -26,6 +34,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        int permission = ContextCompat.checkSelfPermission(this,Manifest.permission.CAMERA);
+        if (permission == PackageManager.PERMISSION_GRANTED){
+            takephoto();
+        }
+        else{
+            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.CAMERA},REQUEST_CODE_CAMERA);
+        }
         if (!logon){
             Intent loginintent = new Intent(this,LoginActivity.class);
             //startActivity(loginintent);
@@ -53,7 +68,16 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void takephoto() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivity(intent);
+    }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
