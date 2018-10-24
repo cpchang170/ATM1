@@ -1,7 +1,10 @@
 package com.askey.hahow.atm1;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -56,7 +59,20 @@ public class IconAdapter extends RecyclerView.Adapter<IconAdapter.IconHolder>{
     }
 
     private void itemClicked(Function func) {
+        switch(func.getIcon()){
+            case R.drawable.func_balance:
+            case R.drawable.func_transaction:
+            case R.drawable.func_finance:
+                break;
+            case R.drawable.func_contacts:
+                Intent contact_intent = new Intent(this.context,ContactActivity.class);
+                this.context.startActivity(contact_intent);
+                break;
+                case R.drawable.func_exit:
+                ((Activity)context).finish();
+                break;
 
+        }
     }
 
     @Override
