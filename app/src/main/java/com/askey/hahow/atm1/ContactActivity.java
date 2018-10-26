@@ -14,9 +14,13 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -130,5 +134,25 @@ public class ContactActivity extends AppCompatActivity {
                 item_phone = itemView.findViewById(android.R.id.text2);
             }
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_upload, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId()==R.id.action_upload){
+            Log.d(TAG, "onOptionsItemSelected: "+ item);
+            String userid = getSharedPreferences("atm",MODE_PRIVATE)
+                    .getString("USERID",null);
+            FirebaseDatabase.getInstance().getReference("usr")
+                    .child(userid)
+                    .child("contacts")
+                    .setValue(contactsList);
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

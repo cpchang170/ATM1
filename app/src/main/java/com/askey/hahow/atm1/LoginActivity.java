@@ -1,5 +1,6 @@
 package com.askey.hahow.atm1;
 
+import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,6 +14,10 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = LoginActivity.class.getSimpleName();
@@ -54,12 +59,49 @@ public class LoginActivity extends AppCompatActivity {
                         .commit();
             }
         });
-    }
 
+        //TestTask test = new TestTask();
+        //test.execute("http://tw.yahoo.com");
+    }
+    public class TestTask extends AsyncTask<String, Void,Integer>{
+
+        @Override
+        protected Integer doInBackground(String... strings) {
+            int data = 0;
+            try {
+                URL url = new URL(strings[0]);
+                data = url.openStream().read();
+                publishProgress();
+                Log.d(TAG, "onCreate: tw.yahoo.com" + data);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return data;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            Log.d(TAG, "onPreExecute: ");
+        }
+
+        @Override
+        protected void onPostExecute(Integer integer) {
+            super.onPostExecute(integer);
+            Log.d(TAG, "onPostExecute: "+integer);
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values) {
+            super.onProgressUpdate(values);
+        }
+    }
     public void login(View v) {
         final String useridstr = eduserid.getText().toString();
         final String pwdstr = edpwd.getText().toString();
-        FirebaseDatabase.getInstance().getReference("usr").child(useridstr).child("passwd")
+            FirebaseDatabase.getInstance().getReference("usr").child(useridstr).child("passwd")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
