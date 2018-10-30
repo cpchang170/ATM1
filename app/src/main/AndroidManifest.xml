@@ -29,6 +29,7 @@
         <activity android:name=".LoginActivity" />
         <activity android:name=".ContactActivity" />
         <activity android:name=".TransActivity"></activity>
+        <service android:name=".HelloService"/>
     </application>
 
 </manifest>

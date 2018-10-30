@@ -1,5 +1,9 @@
 package com.askey.hahow.atm1;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -24,6 +28,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText eduserid;
     private EditText edpwd;
     private CheckBox cb_account_remerber;
+    private Intent helloService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +39,14 @@ public class LoginActivity extends AppCompatActivity {
 //                .putInt("LEVEL",5)
 //                .putString("NAME","CP")
 //                .commit();
+        helloService = new Intent(this,HelloService.class);
+        //Service will queue in the same thread
+        helloService.putExtra("NAME","T1");
+        startService(helloService);
+        helloService.putExtra("NAME","T2");
+        startService(helloService);
+        helloService.putExtra("NAME","T3");
+        startService(helloService);
         int level = getSharedPreferences("atm",MODE_PRIVATE)
                 .getInt("LEVEL",0);
         Log.d(TAG, "onCreate: "+ level);
@@ -62,6 +75,24 @@ public class LoginActivity extends AppCompatActivity {
         //TestTask test = new TestTask();
         //test.execute("http://tw.yahoo.com");
     }
+    BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "onReceive: Hello" +intent.getAction());
+        }
+    };
+    @Override
+    protected void onStart() {
+        super.onStart();
+        registerReceiver(receiver,new IntentFilter(HelloService.ACTION_HELLO_DONE));
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        stopService(helloService);
+    }
+
     public class TestTask extends AsyncTask<String, Void,Integer>{
 
         @Override
