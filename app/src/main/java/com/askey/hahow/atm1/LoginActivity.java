@@ -40,7 +40,6 @@ public class LoginActivity extends AppCompatActivity {
 
         eduserid = findViewById(R.id.ed_account);
         edpwd = findViewById(R.id.ed_pwd);
-
         cb_account_remerber = findViewById(R.id.cb_account_rem_id);
         Boolean account_check =  getSharedPreferences("atm",MODE_PRIVATE)
                 .getBoolean("REMEMBER_ACCOUNT",false);

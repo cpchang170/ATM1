@@ -45,7 +45,7 @@ public class ContactActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.READ_CONTACTS},REQUEST_CODEREAD_CONTACTS);
         }
         contactAdapter = new ContactAdapter(contactsList);
-        RecyclerView recyclerView = findViewById(R.id.contactview);
+        RecyclerView recyclerView = findViewById(R.id.contactrecycler);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
        // recyclerView.setLayoutManager(new GridLayoutManager(this, 3));

@@ -61,6 +61,7 @@ public class IconAdapter extends RecyclerView.Adapter<IconAdapter.IconHolder>{
     private void itemClicked(Function func) {
         switch(func.getIcon()){
             case R.drawable.func_balance:
+                break;
             case R.drawable.func_transaction:
                 Intent trans_intent = new Intent(this.context,TransActivity.class);
                 this.context.startActivity(trans_intent);
