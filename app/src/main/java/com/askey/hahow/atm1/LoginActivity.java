@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -39,6 +41,10 @@ public class LoginActivity extends AppCompatActivity {
 //                .putInt("LEVEL",5)
 //                .putString("NAME","CP")
 //                .commit();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.add(R.id.contain_news,NewsFragment.getinstance());
+        fragmentTransaction.commit();
         helloService = new Intent(this,HelloService.class);
         //Service will queue in the same thread
         helloService.putExtra("NAME","T1");

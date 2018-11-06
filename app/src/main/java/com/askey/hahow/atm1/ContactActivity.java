@@ -1,16 +1,15 @@
 package com.askey.hahow.atm1;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -18,12 +17,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 public class ContactActivity extends AppCompatActivity {
@@ -32,6 +32,7 @@ public class ContactActivity extends AppCompatActivity {
     private static final String TAG = ContactActivity.class.getSimpleName();
     private List<Contacts> contactsList;
     private ContactAdapter contactAdapter;
+    private Cursor cursor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,36 +40,85 @@ public class ContactActivity extends AppCompatActivity {
         setContentView(R.layout.activity_contact);
         int permission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
         if (permission == PackageManager.PERMISSION_GRANTED){
-            readContacts();
+            String []projection ={ContactsContract.Contacts._ID,
+                    ContactsContract.Contacts.DISPLAY_NAME,
+                    ContactsContract.CommonDataKinds.Phone.NUMBER
+            };
+            cursor = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                    projection,null,null,null);
+
+            if (cursor.getCount()!=0) {
+                //readContacts();
+                bindListView();
+                //bindContactAdapter();
+            }
+            else{
+                new AlertDialog.Builder(this)
+                        .setTitle("Warning")
+                        .setMessage("no contact provider")
+                        .setPositiveButton("OK", null)
+                        .show();
+            }
         }
         else{
             ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.READ_CONTACTS},REQUEST_CODEREAD_CONTACTS);
         }
+
+    }
+
+    private void bindListView() {
+        ListView list = findViewById(R.id.list);
+        SimpleCursorAdapter adapter = new SimpleCursorAdapter(ContactActivity.this,
+                android.R.layout.simple_list_item_2,
+                cursor,
+                new String[]{ContactsContract.Contacts.DISPLAY_NAME,ContactsContract.CommonDataKinds.Phone.DATA },
+                new int[]{android.R.id.text1,android.R.id.text2},1);
+        list.setAdapter(adapter);
+    }
+
+    private void bindContactAdapter() {
         contactAdapter = new ContactAdapter(contactsList);
-        RecyclerView recyclerView = findViewById(R.id.contactrecycler);
+        RecyclerView recyclerView = findViewById(R.id.recycler);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-       // recyclerView.setLayoutManager(new GridLayoutManager(this, 3));
+        // recyclerView.setLayoutManager(new GridLayoutManager(this, 3));
 //        recyclerView.setAdapter(new FunctionAdapter(this));
         recyclerView.setAdapter(contactAdapter);
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_CODEREAD_CONTACTS){
             if (grantResults[0]==PackageManager.PERMISSION_GRANTED){
-                readContacts();
+                String []projection ={ContactsContract.Contacts._ID,
+                        ContactsContract.Contacts.DISPLAY_NAME,
+                        ContactsContract.CommonDataKinds.Phone.NUMBER
+                };
+                cursor = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI,
+                        projection,null,null,null);
+                if (cursor.getCount()!=0) {
+                    //readContacts();
+                    bindListView();
+                    //bindContactAdapter();
+                }
+                else{
+                    new AlertDialog.Builder(this)
+                            .setTitle("Warning")
+                            .setMessage("no contact provider")
+                            .setPositiveButton("OK", null)
+                            .show();
+                }
             }
         }
     }
     private void readContacts() {
         //getContentResolver extend from Context , so it can be call directory without new a object
-        Cursor cursor = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI,
-                null,null,null,null);
+
         contactsList = new ArrayList<>();
         while (cursor.moveToNext()){
             int id = cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts._ID));
-            String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+            String name=  cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
             int hasphonenumber = cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
             Contacts contact = new Contacts(id,name);
             Log.d(TAG, "readContacts:" + name);
